@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IOP Summer Costume Party 🌊</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root{--sun:#FFB703;--coral:#FF6B35;--ocean:#0096C7;--seafoam:#48CAE4;--deep:#023E8A;--dark:#03045E;--card-bg:rgba(255,255,255,0.08);--text:#E0F4FF;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Kanit',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:linear-gradient(180deg,#03045E 0%,#023E8A 40%,#0096C7 75%,#00B4D8 100%);z-index:0;pointer-events:none;}
+body::after{content:'';position:fixed;top:-10%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,183,3,0.35) 0%,rgba(255,107,53,0.15) 40%,transparent 70%);z-index:0;pointer-events:none;border-radius:50%;}
+.sparkles{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none;}
+.sparkle{position:absolute;border-radius:50%;animation:twinkle var(--d,3s) var(--delay,0s) infinite;opacity:0;}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(0);}50%{opacity:1;transform:scale(1);}}
+.wave-bg{position:fixed;bottom:0;left:0;right:0;z-index:0;pointer-events:none;height:180px;overflow:hidden;}
+.wave-bg svg{width:200%;animation:wave-move 8s linear infinite;}
+@keyframes wave-move{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* SCREENS */
+.screen{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
+.screen.hidden{display:none;}
+.fade-in{animation:fadeIn 0.6s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* TOP BUTTONS */
+.top-buttons{position:fixed;top:1.2rem;right:1.2rem;z-index:100;display:flex;gap:0.6rem;}
+.icon-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:rgba(3,4,94,0.7);backdrop-filter:blur(10px);cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:background 0.2s,border-color 0.2s;color:var(--text);}
+.icon-btn:hover{background:rgba(72,202,228,0.2);border-color:var(--seafoam);}
+
+/* MODALS (SETTINGS & SCORING) */
+.modal-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;background:rgba(3,4,94,0.85);backdrop-filter:blur(8px);}
+.modal-overlay.hidden{display:none;}
+.modal-box{background:rgba(2,62,138,0.95);border:1px solid rgba(72,202,228,0.3);border-radius:1.5rem;padding:2rem 2.5rem;width:min(90vw,500px);max-height:85vh;overflow-y:auto;box-shadow:0 0 60px rgba(0,0,0,0.5);}
+.modal-title{font-size:1.3rem;font-weight:700;color:var(--seafoam);margin-bottom:1.5rem;text-align:center;}
+.settings-row{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.2rem;cursor:pointer;}
+.chk{width:24px;height:24px;border-radius:6px;border:2px solid var(--seafoam);appearance:none;background:transparent;cursor:pointer;flex-shrink:0;margin-top:2px;position:relative;transition:background 0.15s;}
+.chk:checked{background:var(--seafoam);}
+.chk:checked::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#03045E;font-weight:900;font-size:0.9rem;}
+.settings-label{font-size:0.95rem;line-height:1.5;opacity:0.9;}
+.settings-label small{opacity:0.55;font-size:0.78rem;display:block;margin-top:0.3rem;}
+.modal-close-btn{margin-top:1.5rem;width:100%;padding:0.8rem;border-radius:999px;border:none;background:linear-gradient(135deg,var(--sun),var(--coral));color:#03045E;font-family:'Kanit',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;}
+.modal-cancel-btn{margin-top:0.5rem;width:100%;padding:0.8rem;border-radius:999px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:var(--text);font-family:'Kanit',sans-serif;font-weight:600;font-size:1rem;cursor:pointer;}
+
+/* SCORING STYLES */
+.score-section{margin-bottom:1.5rem;background:rgba(0,0,0,0.2);padding:1rem;border-radius:1rem;}
+.score-section h3{font-size:1.05rem;color:var(--sun);margin-bottom:0.8rem;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:0.5rem;}
+.score-row{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0;border-bottom:1px dashed rgba(255,255,255,0.05);}
+.score-row:last-child{border-bottom:none;}
+.score-input{width:80px;background:rgba(255,255,255,0.1);border:1px solid var(--seafoam);color:#fff;padding:0.4rem;border-radius:0.5rem;text-align:center;font-family:'Kanit',sans-serif;font-size:1rem;}
+.score-radio{width:20px;height:20px;accent-color:var(--sun);cursor:pointer;}
+.score-name{flex:1;cursor:pointer;}
+
+/* START SCREEN */
+#screen-start{text-align:center;gap:1.5rem;}
+.sun-icon{font-size:4rem;animation:sun-spin 10s linear infinite;display:inline-block;filter:drop-shadow(0 0 20px rgba(255,183,3,0.8));}
+@keyframes sun-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.event-badge{font-size:0.82rem;letter-spacing:4px;text-transform:uppercase;color:var(--seafoam);font-weight:600;border:1px solid rgba(72,202,228,0.5);padding:0.4rem 1.4rem;border-radius:999px;display:inline-block;}
+.main-title{font-family:'Pacifico',cursive;font-size:clamp(2.2rem,7vw,4.5rem);line-height:1.2;background:linear-gradient(135deg,#FFB703,#FF6B35,#48CAE4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sub-title{font-size:clamp(0.95rem,3vw,1.3rem);font-weight:300;opacity:0.75;}
+.prize-row{display:flex;flex-wrap:wrap;gap:0.8rem;justify-content:center;}
+.prize-chip{padding:0.5rem 1.2rem;border-radius:999px;font-size:0.88rem;font-weight:600;}
+.prize-chip.sun{background:rgba(255,183,3,0.15);border:1px solid var(--sun);color:var(--sun);}
+.prize-chip.coral{background:rgba(255,107,53,0.15);border:1px solid var(--coral);color:#FFB08A;}
+.prize-chip.sea{background:rgba(72,202,228,0.15);border:1px solid var(--seafoam);color:var(--seafoam);}
+.start-btn-row{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;}
+.btn-start{cursor:pointer;border:none;background:linear-gradient(135deg,#FFB703,#FF6B35);color:#03045E;font-family:'Kanit',sans-serif;font-size:1.3rem;font-weight:900;padding:1rem 3.5rem;border-radius:999px;letter-spacing:2px;text-transform:uppercase;transition:transform 0.15s;animation:pulse-btn 2s ease-in-out infinite;}
+.btn-start:hover{transform:scale(1.05);}
+@keyframes pulse-btn{0%,100%{box-shadow:0 0 40px rgba(255,183,3,0.5),0 0 80px rgba(255,107,53,0.2);}50%{box-shadow:0 0 60px rgba(255,183,3,0.8),0 0 120px rgba(255,107,53,0.4);}}
+.btn-gallery{cursor:pointer;border:1px solid rgba(72,202,228,0.5);background:rgba(72,202,228,0.1);color:var(--seafoam);font-family:'Kanit',sans-serif;font-size:1rem;font-weight:700;padding:0.9rem 2rem;border-radius:999px;transition:background 0.2s;}
+.btn-gallery:hover{background:rgba(72,202,228,0.2);}
+
+/* GALLERY SCREEN */
+#screen-gallery{gap:1.5rem;padding:2rem 1.5rem;justify-content:flex-start;padding-top:3rem;}
+.gallery-title{font-family:'Pacifico',cursive;font-size:clamp(1.5rem,4vw,2.2rem);color:var(--seafoam);text-align:center;}
+.btn-unlock-all {cursor: pointer;border: 2px solid var(--sun);background: linear-gradient(135deg, rgba(255,183,3,0.15), rgba(255,107,53,0.15));color: var(--sun);font-family: 'Kanit', sans-serif;font-size: 1.1rem;font-weight: 700;padding: 0.8rem 2.5rem;border-radius: 999px;transition: all 0.3s ease;box-shadow: 0 0 20px rgba(255,183,3,0.2);margin-bottom: 0.5rem;}
+.btn-unlock-all:hover {background: linear-gradient(135deg, var(--sun), var(--coral));color: #03045E;box-shadow: 0 0 40px rgba(255,183,3,0.6);transform: scale(1.05);}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;width:100%;max-width:680px;}
+.gallery-card{position:relative;border-radius:1rem;overflow:hidden;cursor:pointer;aspect-ratio:3/4;background:rgba(2,62,138,0.7);border:1px solid rgba(72,202,228,0.2);transition:transform 0.2s,border-color 0.2s,box-shadow 0.2s;}
+.gallery-card:hover{transform:scale(1.04);border-color:var(--seafoam);box-shadow:0 0 24px rgba(72,202,228,0.35);}
+.sil-img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;filter:brightness(0) opacity(0.5); transition: filter 1.5s ease;}
+.num-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Pacifico',cursive;font-size:clamp(2.5rem,6vw,3.5rem);color:rgba(72,202,228,0.9);text-shadow:0 0 20px rgba(72,202,228,0.6);pointer-events:none; transition: opacity 0.5s ease;}
+.lock-overlay{position:absolute;bottom:0.8rem;right:0.8rem;font-size:1.3rem;opacity:0.5;pointer-events:none; transition: opacity 0.5s ease;}
+.gallery-card.unlocked .sil-img {filter: none;}
+.gallery-card.unlocked .num-badge,.gallery-card.unlocked .lock-overlay {opacity: 0;}
+.name-tag {position: absolute; bottom: 0; left: 0; right: 0;background: linear-gradient(to top, rgba(2,62,138,0.95), transparent);padding: 1.5rem 0.5rem 0.5rem; text-align: center;opacity: 0; transform: translateY(20px); transition: all 0.8s ease; pointer-events: none;}
+.gallery-card.unlocked .name-tag { opacity: 1; transform: translateY(0); }
+.name-tag .nick { font-size: 1.1rem; font-weight: 700; color: var(--sun); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+.name-tag .fullname { font-size: 0.75rem; color: var(--text); opacity: 0.8; }
+.grand-sunburst {position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);width: 150vw; height: 150vw;background: radial-gradient(circle, rgba(255,183,3,0.4) 0%, rgba(255,107,53,0.1) 40%, transparent 70%);z-index: 300; pointer-events: none; opacity: 0; mix-blend-mode: screen;}
+.grand-sunburst.active { animation: sunburst-expand 2.5s ease-out forwards; }
+@keyframes sunburst-expand {0% { transform: translate(-50%, -50%) scale(0); opacity: 1; } 50% { opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }}
+.water-splash {position: absolute; bottom: 0; left: 0; right: 0; height: 100%;background: linear-gradient(to top, var(--seafoam), transparent);z-index: 2; opacity: 0; pointer-events: none;}
+.gallery-card.unlocked .water-splash { animation: splash-up 1.5s ease-out forwards; }
+@keyframes splash-up {0% { transform: translateY(100%); opacity: 0.8; } 50% { opacity: 0.5; } 100% { transform: translateY(-100%); opacity: 0; }}
+.btn-back{cursor:pointer;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:var(--text);font-family:'Kanit',sans-serif;font-size:0.95rem;font-weight:600;padding:0.7rem 2rem;border-radius:999px;transition:background 0.2s;}
+.btn-back:hover{background:rgba(255,255,255,0.12);}
+
+/* LIGHTBOX (Update with Arrows & Theme) */
+.lightbox{position:fixed;inset:0;background:rgba(3,4,94,0.95);backdrop-filter:blur(10px);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+.lightbox.hidden{display:none;}
+.lb-close{position:absolute;top:2rem;right:2rem;font-size:2rem;cursor:pointer;opacity:0.6;transition:opacity 0.2s;}
+.lb-close:hover{opacity:1;}
+
+/* Container for image and arrows */
+.lb-content-wrapper {
+  display: flex; align-items: center; justify-content: center;
+  gap: 1.5rem;
+  max-width: 90vw;
+  max-height: 75vh;
+  position: relative; /* For theme elements */
+}
+
+/* ── LIGHTBOX NAVIGATION ARROWS ── */
+.lb-arrow {
+  font-size: 4rem; cursor: pointer;
+  color: var(--sun); /* Sun color */
+  transition: all 0.3s ease;
+  opacity: 0.4;
+  text-shadow: 0 0 10px rgba(255,183,3,0.4);
+  user-select: none;
+}
+.lb-arrow:hover {
+  opacity: 1; transform: scale(1.1);
+  color: var(--seafoam); /* Sea color on hover */
+  text-shadow: 0 0 20px rgba(72,202,228,0.8);
+}
+.lb-prev { margin-right: 0.5rem; }
+.lb-next { margin-left: 0.5rem; }
+
+/* ── THEMATIC LIGHTBOX CONTENT ── */
+#lb-content {
+  border: 4px solid var(--deep);
+  border-image: linear-gradient(135deg, var(--deep), var(--seafoam), var(--deep)) 1;
+  border-radius: 1.5rem;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+/* Subbtle sea and sun glow element behind content */
+#lb-content::after {
+  content: ''; position: absolute; inset: -20px;
+  background: radial-gradient(circle at 50% 50%, rgba(255,183,3,0.05) 0%, rgba(0,150,199,0.05) 100%);
+  z-index: -1; animation: rotation-slow 10s infinite linear;
+}
+@keyframes rotation-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+#lb-content img{max-width:100%;max-height:75vh;border-radius:1rem;}
+.lb-meta{margin-top:1.5rem;text-align:center;}
+.lbn{font-size:1.5rem;font-weight:700;color:var(--sun);}
+.lbd{font-size:1rem;opacity:0.7;}
+
+/* SELECT SCREEN */
+#screen-select{gap:1.8rem;justify-content:center;padding:2rem;}
+.screen-heading{text-align:center;font-size:clamp(1.4rem,4vw,2rem);font-weight:700;color:var(--seafoam);}
+.award-grid{display:flex;flex-direction:column;gap:1.1rem;width:100%;max-width:560px;}
+.award-card{width:100%;background:var(--card-bg);border-radius:1.4rem;padding:1.4rem 2rem;display:flex;align-items:center;gap:1.4rem;border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:transform 0.2s,border-color 0.2s,box-shadow 0.2s;backdrop-filter:blur(12px);}
+.award-card:hover{transform:translateX(8px);}
+.award-card.sun-card{border-color:rgba(255,183,3,0.3);}
+.award-card.sun-card:hover{border-color:var(--sun);box-shadow:0 0 30px rgba(255,183,3,0.25);}
+.award-card.coral-card{border-color:rgba(255,107,53,0.3);}
+.award-card.coral-card:hover{border-color:var(--coral);box-shadow:0 0 30px rgba(255,107,53,0.25);}
+.award-card.sea-card{border-color:rgba(72,202,228,0.3);}
+.award-card.sea-card:hover{border-color:var(--seafoam);box-shadow:0 0 30px rgba(72,202,228,0.25);}
+.award-card.done-card{opacity:0.45;cursor:default;pointer-events:none;}
+.award-icon{font-size:2.6rem;flex-shrink:0;}
+.award-info{flex:1;}
+.award-name{font-size:1.15rem;font-weight:700;margin-bottom:0.2rem;}
+.award-desc{font-size:0.8rem;opacity:0.55;font-weight:300;}
+.award-status{margin-top:0.3rem;font-size:0.82rem;font-weight:600;}
+.award-status.sun{color:var(--sun);}
+.award-status.coral{color:#FFB08A;}
+.award-status.sea{color:var(--seafoam);}
+.award-arrow{font-size:1.4rem;opacity:0.4;flex-shrink:0;transition:opacity 0.2s,transform 0.2s;}
+.award-card:hover .award-arrow{opacity:1;transform:translateX(4px);}
+
+/* SPIN SCREEN */
+#screen-spin{text-align:center;gap:2rem;}
+.spin-title{font-size:clamp(1.2rem,4vw,1.8rem);font-weight:700;color:var(--seafoam);}
+.reel-wrapper{width:min(90vw,500px);height:260px;overflow:hidden;border-radius:1.5rem;border:2px solid rgba(72,202,228,0.25);background:rgba(2,62,138,0.5);position:relative;}
+.reel-wrapper::before,.reel-wrapper::after{content:'';position:absolute;left:0;right:0;z-index:2;height:90px;pointer-events:none;}
+.reel-wrapper::before{top:0;background:linear-gradient(to bottom,rgba(3,4,94,0.95),transparent);}
+.reel-wrapper::after{bottom:0;background:linear-gradient(to top,rgba(3,4,94,0.95),transparent);}
+.highlight-bar{position:absolute;top:50%;left:0;right:0;height:80px;transform:translateY(-50%);background:rgba(72,202,228,0.06);border-top:1px solid rgba(72,202,228,0.3);border-bottom:1px solid rgba(72,202,228,0.3);z-index:1;}
+.reel{display:flex;flex-direction:column;align-items:center;}
+.reel-item{height:80px;display:flex;align-items:center;gap:1rem;flex-shrink:0;width:100%;padding:0 1.5rem;justify-content:center;}
+.ri-placeholder{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;background:rgba(255,255,255,0.08);border:2px solid rgba(72,202,228,0.3);flex-shrink:0;overflow:hidden;}
+.ri-info{text-align:left;}
+.ri-name{font-weight:700;font-size:1rem;}
+.ri-nick{font-size:0.78rem;opacity:0.55;}
+.countdown-bar{width:min(90vw,500px);height:6px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden;}
+.countdown-fill{height:100%;width:100%;border-radius:999px;background:linear-gradient(90deg,#FFB703,#48CAE4);transform-origin:left;animation:shrink 7s linear forwards;}
+@keyframes shrink{from{transform:scaleX(1);}to{transform:scaleX(0);}}
+
+/* WINNER SCREEN */
+#screen-winner{flex-direction:row;align-items:stretch;justify-content:center;gap:0;padding:0;}
+.winner-photo-panel{flex:0 0 42%;max-width:480px;min-height:100vh;position:relative;overflow:hidden;}
+.winner-photo-panel img,.winner-photo-panel .winner-placeholder{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block;}
+.winner-placeholder{background:rgba(2,62,138,0.6);display:flex;align-items:center;justify-content:center;font-size:8rem;}
+.winner-photo-panel::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(3,4,94,0.05) 0%,rgba(3,4,94,0.6) 100%);z-index:1;}
+.winner-info-panel{flex:1;display:flex;flex-direction:column;justify-content:center;padding:3rem 3.5rem 3rem 3rem;gap:0.8rem;min-height:100vh;background:rgba(2,62,138,0.25);backdrop-filter:blur(4px);}
+.winner-label{font-size:clamp(1.1rem,2.5vw,1.6rem);letter-spacing:3px;text-transform:uppercase;color:var(--seafoam);font-weight:700;}
+.winner-award-name{font-family:'Pacifico',cursive;font-size:clamp(1.8rem,4.5vw,3.2rem);line-height:1.25;margin-bottom:0.5rem;}
+.confetti-emojis{font-size:2.2rem;animation:pop-in 0.5s cubic-bezier(0.175,0.885,0.32,1.275);}
+@keyframes pop-in{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+.winner-name{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:900;line-height:1.2;}
+.winner-nick{font-size:clamp(1rem,2vw,1.4rem);opacity:0.65;}
+.winner-dept{font-size:0.9rem;opacity:0.45;margin-bottom:0.5rem;}
+.winner-main-score{font-size:1.2rem;font-weight:700;color:var(--seafoam);margin-bottom:1rem;display:none;}
+.btn-next{cursor:pointer;border:1px solid rgba(72,202,228,0.4);background:rgba(72,202,228,0.08);color:var(--text);font-family:'Kanit',sans-serif;font-size:1rem;font-weight:600;padding:0.75rem 2.5rem;border-radius:999px;transition:background 0.2s;width:fit-content;margin-top:1rem;}
+.btn-next:hover{background:rgba(72,202,228,0.18);border-color:var(--seafoam);}
+
+/* RUNNER UPS (For Superstar) */
+.runner-ups{display:none; gap:1rem; margin-top:1rem; border-top:1px solid rgba(255,255,255,0.1); padding-top:1.5rem; width:100%; max-width:400px;}
+.ru-card{flex:1; background:rgba(0,0,0,0.25); padding:1rem; border-radius:1rem; border:1px solid rgba(72,202,228,0.15); text-align:center;}
+.ru-rank{font-size:1.1rem; font-weight:700; margin-bottom:0.3rem;}
+.ru-name{font-size:0.9rem; margin-bottom:0.2rem;}
+.ru-score{font-size:0.85rem; color:var(--seafoam); font-weight:600;}
+
+@media(max-width:640px){#screen-winner{flex-direction:column;}.winner-photo-panel{flex:0 0 55vw;min-height:55vw;max-width:100%;}.winner-info-panel{min-height:auto;padding:2rem 1.5rem;text-align:center;align-items:center;}.btn-next{margin:1rem auto 0 auto;}}
+
+/* DONE SCREEN */
+#screen-done{text-align:center;gap:1.5rem;}
+.done-title{font-family:'Pacifico',cursive;font-size:clamp(2rem,6vw,3.5rem);background:linear-gradient(135deg,#FFB703,#FF6B35,#48CAE4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.summary-grid{display:flex;flex-wrap:wrap;gap:1.2rem;justify-content:center;max-width:900px;}
+.summary-card{background:var(--card-bg);border-radius:1.2rem;padding:1.5rem;width:clamp(200px,28vw,260px);border:1px solid rgba(255,255,255,0.1);text-align:center;backdrop-filter:blur(10px);}
+.summary-icon{font-size:2rem;margin-bottom:0.5rem;}
+.summary-award{font-size:0.8rem;letter-spacing:2px;opacity:0.5;text-transform:uppercase;margin-bottom:0.4rem;}
+.summary-winner-name{font-weight:900;font-size:1.1rem;}
+.summary-winner-nick{font-size:0.85rem;opacity:0.55;}
+.btn-restart{cursor:pointer;border:none;background:linear-gradient(135deg,#FFB703,#FF6B35);color:#03045E;font-family:'Kanit',sans-serif;font-size:1rem;font-weight:900;padding:0.85rem 2.5rem;border-radius:999px;transition:transform 0.15s;}
+.btn-restart:hover{transform:scale(1.04);}
+
+/* FLOATERS */
+.floater{position:fixed;font-size:1.8rem;pointer-events:none;z-index:400;animation:float-up 2s ease-out forwards;}
+@keyframes float-up{from{opacity:1;transform:translateY(0) rotate(0deg);}to{opacity:0;transform:translateY(-200px) rotate(45deg);}}
+</style>
+</head>
+<body>
+
+<div class="sparkles" id="sparkles"></div>
+<div class="wave-bg">
+  <svg viewBox="0 0 1440 180" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" height="180">
+    <path d="M0,80 C180,140 360,20 540,80 C720,140 900,20 1080,80 C1260,140 1440,20 1440,80 L1440,180 L0,180 Z" fill="rgba(0,150,199,0.25)"/>
+    <path d="M0,110 C200,160 400,60 600,110 C800,160 1000,60 1200,110 C1350,145 1440,90 1440,110 L1440,180 L0,180 Z" fill="rgba(72,202,228,0.15)"/>
+  </svg>
+</div>
+
+<div class="top-buttons">
+  <button class="icon-btn" onclick="openScoring()" title="ลงคะแนน / โหวต">📝</button>
+  <button class="icon-btn" id="mute-btn" onclick="toggleMute()" title="เปิด/ปิดเสียง">🔊</button>
+  <button class="icon-btn" onclick="openSettings()" title="ตั้งค่า">⚙️</button>
+</div>
+
+<div class="modal-overlay hidden" id="scoring-overlay">
+  <div class="modal-box">
+    <div class="modal-title">📝 ลงคะแนนโหวตจากกรรมการ</div>
+    
+    <div class="score-section">
+      <h3>🌊 ซุปตาร์ IOP (ใส่คะแนนโหวต)</h3>
+      <div id="scoring-superstar-list"></div>
+    </div>
+
+    <div class="score-section">
+      <h3>🏆 เลิศเลยล่ะ IOP (เลือก 1 คน)</h3>
+      <div id="scoring-lert-list"></div>
+    </div>
+
+    <div class="score-section">
+      <h3>🌺 Beautiful เกินต้าน (เลือก 1 คน)</h3>
+      <div id="scoring-beautiful-list"></div>
+    </div>
+
+    <button class="modal-close-btn" onclick="saveScoring()">✅ บันทึกคะแนน</button>
+    <button class="modal-cancel-btn" onclick="closeScoring()">ปิด</button>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="settings-overlay">
+  <div class="modal-box">
+    <div class="modal-title">⚙️ ตั้งค่าระบบ</div>
+    <label class="settings-row">
+      <input type="checkbox" class="chk" id="no-repeat-check">
+      <div class="settings-label">
+        ไม่ให้รางวัลซ้ำคน
+        <small>ถ้าเปิด: ผู้ที่ได้รางวัลไปแล้วจะถูกข้ามไปในรางวัลถัดไป แม้จะมีคะแนนสูงกว่า</small>
+      </div>
+    </label>
+    <button class="modal-close-btn" onclick="closeSettings()">✅ บันทึกและปิด</button>
+  </div>
+</div>
+
+<div class="lightbox hidden" id="lightbox">
+  <div class="lb-close" onclick="closeLightbox()">✕</div>
+  
+  <div class="lb-content-wrapper">
+      <div class="lb-arrow lb-prev" onclick="prevLightbox()">‹</div>
+      <div id="lb-content"></div>
+      <div class="lb-arrow lb-next" onclick="nextLightbox()">›</div>
+  </div>
+  
+  <div class="lb-meta" id="lb-meta"></div>
+</div>
+
+<div class="screen" id="screen-start">
+  <div class="sun-icon">☀️</div>
+  <div class="event-badge">🌊 Best Dressed Reveal Night 🌊</div>
+  <h1 class="main-title">IOP Summer<br>Costume Party</h1>
+  <p class="sub-title">มูลค่ารางวัลรวม 10,000 บาท · 3 รางวัลสุดปัง</p>
+  <div class="prize-row">
+    <span class="prize-chip sun">🏆 เลิศเลยล่ะ IOP</span>
+    <span class="prize-chip coral">🌺 Beautiful เกินต้าน</span>
+    <span class="prize-chip sea">🌊 ซุปตาร์ IOP</span>
+  </div>
+  <div class="start-btn-row">
+    <button class="btn-start" onclick="goToSelect()">🌞 Press to Start 🌞</button>
+    <button class="btn-gallery" onclick="gotoGallery()">👗 ดูผู้เข้าแข่งขัน</button>
+  </div>
+</div>
+
+<div class="screen hidden" id="screen-gallery">
+  <h2 class="gallery-title">🌟 ผู้เข้าแข่งขัน</h2>
+  <button class="btn-unlock-all" id="btn-unlock-all" onclick="unlockAllGallery()">☀️ เปิดวาร์ปผู้เข้าแข่งขันทั้งหมด 🌊</button>
+  <div class="gallery-grid" id="gallery-grid"></div>
+  <button class="btn-back" onclick="showScreen('screen-start')">← กลับหน้าหลัก</button>
+  <div class="grand-sunburst" id="grand-sunburst"></div>
+</div>
+
+<div class="screen hidden" id="screen-select">
+  <p class="screen-heading">🌊 เลือกรางวัลที่ต้องการประกาศ</p>
+  <div class="award-grid">
+    <div class="award-card sea-card" id="card-superstar" onclick="startReveal('superstar')">
+      <div class="award-icon">🌊</div>
+      <div class="award-info">
+        <div class="award-name">ซุปตาร์ IOP</div>
+        <div class="award-desc">สตาร์แห่งงาน ทุกสายตาจับจ้อง</div>
+        <div class="award-status sea" id="superstar-status">พร้อมประกาศ</div>
+      </div>
+      <div class="award-arrow">›</div>
+    </div>
+    <div class="award-card sun-card" id="card-lert" onclick="startReveal('lert')">
+      <div class="award-icon">🏆</div>
+      <div class="award-info">
+        <div class="award-name">เลิศเลยล่ะ IOP</div>
+        <div class="award-desc">ชุดที่โดดเด่นและครีเอทีฟสุดในงาน</div>
+        <div class="award-status sun" id="lert-status">พร้อมประกาศ</div>
+      </div>
+      <div class="award-arrow">›</div>
+    </div>
+    <div class="award-card coral-card" id="card-beautiful" onclick="startReveal('beautiful')">
+      <div class="award-icon">🌺</div>
+      <div class="award-info">
+        <div class="award-name">Beautiful เกินต้าน</div>
+        <div class="award-desc">ชุดที่สวยงามจนต้านทานไม่ไหว</div>
+        <div class="award-status coral" id="beautiful-status">พร้อมประกาศ</div>
+      </div>
+      <div class="award-arrow">›</div>
+    </div>
+  </div>
+</div>
+
+<div class="screen hidden" id="screen-spin">
+  <p class="spin-title" id="spin-label">กำลังเปิดเผยผู้ชนะ...</p>
+  <div class="reel-wrapper">
+    <div class="highlight-bar"></div>
+    <div class="reel" id="reel"></div>
+  </div>
+  <div class="countdown-bar"><div class="countdown-fill" id="countdown-fill"></div></div>
+</div>
+
+<div class="screen hidden" id="screen-winner">
+  <div class="winner-photo-panel" id="winner-photo-panel">
+    <div class="winner-placeholder" id="winner-photo-slot">🌸</div>
+  </div>
+  <div class="winner-info-panel">
+    <p class="winner-label">🎉 ผู้ชนะรางวัล</p>
+    <h2 class="winner-award-name" id="winner-award-name">—</h2>
+    <div class="confetti-emojis">🌊🏆☀️🌺🎉</div>
+    <p class="winner-name" id="winner-name">—</p>
+    <p class="winner-nick" id="winner-nick">—</p>
+    <p class="winner-dept" id="winner-dept">—</p>
+    <p class="winner-main-score" id="winner-main-score">—</p>
+    
+    <div class="runner-ups" id="runner-ups-container">
+      <div class="ru-card">
+        <div class="ru-rank">🥈 อันดับ 2</div>
+        <div class="ru-name" id="ru2-name">—</div>
+        <div class="ru-score" id="ru2-score">—</div>
+      </div>
+      <div class="ru-card">
+        <div class="ru-rank">🥉 อันดับ 3</div>
+        <div class="ru-name" id="ru3-name">—</div>
+        <div class="ru-score" id="ru3-score">—</div>
+      </div>
+    </div>
+
+    <button class="btn-next" onclick="goToSelect()">ประกาศรางวัลถัดไป →</button>
+  </div>
+</div>
+
+<div class="screen hidden" id="screen-done">
+  <p style="font-size:3rem">🎉</p>
+  <h2 class="done-title">ขอแสดงความยินดี!</h2>
+  <p style="opacity:0.6;margin-bottom:1.5rem">กับผู้ชนะทุกท่านจาก IOP Summer Costume Party</p>
+  <div class="summary-grid" id="summary-grid"></div>
+  <button class="btn-restart" onclick="restart()" style="margin-top:1rem">เริ่มใหม่อีกครั้ง</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  📋 ข้อมูลผู้เข้าแข่งขัน (คงเดิม)
+// ═══════════════════════════════════════════════════════════
+const contestants = [
+  { id:6, displayOrder:6, prefix:'นางสาว', firstName:'พทัศมน',   lastName:'สบายสุข',       nick:'ศรีแพร', dept:'กลุ่มงานจุลพยาธิ'       },
+  { id:5, displayOrder:5, prefix:'นางสาว', firstName:'วรรณวิศา', lastName:'อินทรมณี',      nick:'กี้',    dept:'กลุ่มงานศัลยพยาธิ'       },
+  { id:4, displayOrder:4, prefix:'นางสาว', firstName:'นวินดา',   lastName:'สุริยะ',         nick:'โอ๋',   dept:'งานพัสดุและบำรุงรักษา'   },
+  { id:3, displayOrder:3, prefix:'นางสาว', firstName:'ชุดาภรณ์', lastName:'ภู่ระหงษ์',    nick:'เอ๋ย',  dept:'งานการเงิน'                },
+  { id:2, displayOrder:2, prefix:'นางสาว', firstName:'สุชานรี',  lastName:'จิรภัทรอนันต์', nick:'แบมบู', dept:'ศูนย์รับสิ่งส่งตรวจ'     },
+  { id:1, displayOrder:1, prefix:'นาย',    firstName:'วุฒิพันธ์',lastName:'อินทบัณฑิตร์', nick:'ฟิล์ม', dept:'กลุ่มงานตรวจศพ'           },
+];
+
+let votes_lert      = [0, 0, 0, 0, 0, 0];
+let votes_beautiful = [0, 0, 0, 0, 0, 0];
+let votes_superstar = [0, 0, 0, 0, 0, 0];
+
+const awards = {
+  lert:      { key:'lert',      name:'🏆 เลิศเลยล่ะ IOP',     shortName:'เลิศเลยล่ะ IOP',    icon:'🏆', color:'#FFB703', votes:votes_lert },
+  beautiful: { key:'beautiful', name:'🌺 Beautiful เกินต้าน', shortName:'Beautiful เกินต้าน', icon:'🌺', color:'#FF6B35', votes:votes_beautiful },
+  superstar: { key:'superstar', name:'🌊 ซุปตาร์ IOP',         shortName:'ซุปตาร์ IOP',        icon:'🌊', color:'#48CAE4', votes:votes_superstar },
+};
+
+const revealed = {};
+let isMuted = false;
+let audioCtx = null;
+let drumInterval = null;
+let isGalleryUnlocked = false;
+
+// ── LIGHTBOX NAVIGATION STATE ──
+let currentLightboxContestantId = null;
+
+const reelOrder = [...contestants].sort((a,b) => a.displayOrder - b.displayOrder);
+
+// ═══════════════════════════════════════════════════════════
+//  MODALS (SETTINGS & SCORING) (คงเดิม)
+// ═══════════════════════════════════════════════════════════
+function openSettings()  { document.getElementById('settings-overlay').classList.remove('hidden'); }
+function closeSettings() { document.getElementById('settings-overlay').classList.add('hidden'); }
+function isNoRepeat()    { return document.getElementById('no-repeat-check').checked; }
+
+function openScoring() {
+  buildScoringUI();
+  document.getElementById('scoring-overlay').classList.remove('hidden');
+}
+function closeScoring() {
+  document.getElementById('scoring-overlay').classList.add('hidden');
+}
+
+function buildScoringUI() {
+  const ssList = document.getElementById('scoring-superstar-list');
+  const lertList = document.getElementById('scoring-lert-list');
+  const beauList = document.getElementById('scoring-beautiful-list');
+
+  let ssHtml = '', lertHtml = '', beauHtml = '';
+  
+  contestants.forEach((c, i) => {
+    const displayName = `<span class="score-name"><b>${c.nick}</b> (${c.firstName})</span>`;
+    
+    // ซุปตาร์ (ใส่คะแนน)
+    ssHtml += `
+      <div class="score-row">
+        ${displayName}
+        <input type="number" class="score-input" id="ss-input-${i}" value="${awards.superstar.votes[i]}" min="0" onfocus="this.select()">
+      </div>`;
+      
+    // เลิศเลยล่ะ (เลือก 1)
+    lertHtml += `
+      <label class="score-row" style="cursor:pointer;">
+        ${displayName}
+        <input type="radio" class="score-radio" name="lert_winner" value="${i}" ${awards.lert.votes[i] > 0 ? 'checked' : ''}>
+      </label>`;
+      
+    // Beautiful (เลือก 1)
+    beauHtml += `
+      <label class="score-row" style="cursor:pointer;">
+        ${displayName}
+        <input type="radio" class="score-radio" name="beau_winner" value="${i}" ${awards.beautiful.votes[i] > 0 ? 'checked' : ''}>
+      </label>`;
+  });
+
+  ssList.innerHTML = ssHtml;
+  lertList.innerHTML = lertHtml;
+  beauList.innerHTML = beauHtml;
+}
+
+function saveScoring() {
+  // บันทึกซุปตาร์
+  contestants.forEach((c, i) => {
+    const val = parseInt(document.getElementById(`ss-input-${i}`).value) || 0;
+    awards.superstar.votes[i] = val;
+  });
+
+  // ล้างค่า เลิศ/Beautiful เดิม
+  for(let i=0; i<6; i++) {
+    awards.lert.votes[i] = 0;
+    awards.beautiful.votes[i] = 0;
+  }
+
+  // บันทึก เลิศ
+  const lertWin = document.querySelector('input[name="lert_winner"]:checked');
+  if(lertWin) awards.lert.votes[parseInt(lertWin.value)] = 1;
+
+  // บันทึก Beautiful
+  const beauWin = document.querySelector('input[name="beau_winner"]:checked');
+  if(beauWin) awards.beautiful.votes[parseInt(beauWin.value)] = 1;
+
+  closeScoring();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AUDIO (คงเดิม)
+// ═══════════════════════════════════════════════════════════
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function tone(freq, type, dur, vol=0.25, delay=0) {
+  if (isMuted) return;
+  try {
+    const ctx = getCtx();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = type; o.frequency.value = freq;
+    const t = ctx.currentTime + delay;
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.start(t); o.stop(t + dur + 0.01);
+  } catch(e){}
+}
+function startDrumRoll() {
+  stopDrumRoll(); let beat = 0; const freqs = [160, 200]; let interval = 160;
+  function schedule() {
+    if (isMuted) { drumInterval = setTimeout(schedule, interval); return; }
+    tone(freqs[beat%2], 'square', 0.05, 0.18); tone(800, 'sawtooth', 0.03, 0.06);
+    beat++; if (beat < 20 && interval > 80) interval = Math.max(80, interval - 4);
+    drumInterval = setTimeout(schedule, interval);
+  }
+  schedule();
+}
+function stopDrumRoll() { if (drumInterval) { clearTimeout(drumInterval); drumInterval = null; } }
+function playFanfare() {
+  if (isMuted) return;
+  [[523,0],[659,0.13],[784,0.26],[1047,0.39],[1047,0.55],[784,0.68],[1047,0.8]].forEach(([f,d])=>{tone(f,'triangle',0.35,0.4,d);});
+}
+function toggleMute() {
+  isMuted = !isMuted;
+  document.getElementById('mute-btn').textContent = isMuted ? '🔇' : '🔊';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SPARKLES (คงเดิม)
+// ═══════════════════════════════════════════════════════════
+(function(){
+  const c = document.getElementById('sparkles');
+  const cols = ['rgba(72,202,228,0.6)','rgba(255,183,3,0.5)','rgba(255,107,53,0.4)','rgba(255,255,255,0.5)'];
+  for(let i=0;i<60;i++){
+    const s = document.createElement('div'); s.className='sparkle';
+    const sz=2+Math.random()*5;
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*5}s;--delay:${Math.random()*6}s;width:${sz}px;height:${sz}px;background:${cols[Math.floor(Math.random()*cols.length)]};`;
+    c.appendChild(s);
+  }
+})();
+
+// ═══════════════════════════════════════════════════════════
+//  GALLERY & LIGHTBOX (Updated)
+// ═══════════════════════════════════════════════════════════
+function gotoGallery() { 
+  buildGallery(); 
+  if(isGalleryUnlocked) document.getElementById('btn-unlock-all').style.display = 'none';
+  else document.getElementById('btn-unlock-all').style.display = 'flex';
+  showScreen('screen-gallery'); 
+}
+function buildGallery() {
+  const grid = document.getElementById('gallery-grid'); grid.innerHTML = '';
+  reelOrder.forEach(c => {
+    const card = document.createElement('div'); card.className = 'gallery-card'; card.id = `gc-${c.id}`;
+    if (isGalleryUnlocked) card.classList.add('unlocked');
+    const splash = document.createElement('div'); splash.className = 'water-splash';
+    const img = document.createElement('img'); img.className = 'sil-img'; img.src = `${c.id}.png`; img.onerror = () => { img.remove(); };
+    const badge = document.createElement('div'); badge.className = 'num-badge'; badge.textContent = `#${c.displayOrder}`;
+    const nameTag = document.createElement('div'); nameTag.className = 'name-tag';
+    nameTag.innerHTML = `<div class="nick">${c.nick}</div><div class="fullname">${c.prefix}${c.firstName} ${c.lastName}</div>`;
+    const lock = document.createElement('div'); lock.className = 'lock-overlay'; lock.textContent = '🔒';
+    card.appendChild(splash); card.appendChild(img); card.appendChild(badge); card.appendChild(nameTag); card.appendChild(lock);
+    card.onclick = () => openLightbox(c); grid.appendChild(card);
+  });
+}
+function unlockAllGallery() {
+  if (isGalleryUnlocked) return; isGalleryUnlocked = true; playFanfare();
+  const sunburst = document.getElementById('grand-sunburst'); sunburst.classList.remove('active'); void sunburst.offsetWidth; sunburst.classList.add('active');
+  document.querySelectorAll('.gallery-card').forEach((card, index) => {
+    setTimeout(() => { card.classList.add('unlocked');
+      const f = document.createElement('div'); f.className = 'floater'; f.textContent = ['🌊','☀️','✨','🐠','🌺'][Math.floor(Math.random()*5)];
+      const rect = card.getBoundingClientRect(); f.style.left = (rect.left+rect.width/2-20)+'px'; f.style.top = (rect.top+rect.height/2-20)+'px'; f.style.zIndex='600'; document.body.appendChild(f); setTimeout(()=>f.remove(),2000);
+    }, index * 250);
+  });
+  const btn = document.getElementById('btn-unlock-all'); btn.style.opacity = '0'; btn.style.pointerEvents = 'none'; setTimeout(() => btn.style.display = 'none', 500);
+}
+
+// ── LIGHTBOX (Updated for Navigation) ──
+function openLightbox(c) {
+  currentLightboxContestantId = c.id; // Set current ID for navigation
+
+  const isWon = Object.values(revealed).some(idx => contestants[idx].id === c.id);
+  const lb = document.getElementById('lightbox'), content = document.getElementById('lb-content'), meta = document.getElementById('lb-meta');
+  
+  content.innerHTML = '';
+  if (isWon || isGalleryUnlocked) {
+    const img = new Image(); img.src = `${c.id}.png`; img.onerror = () => { content.innerHTML = `<div style="font-size:7rem;text-align:center">🌸</div>`; }; content.appendChild(img);
+  } else { content.innerHTML = `<div style="font-size:6rem;text-align:center;padding:2rem">🔒</div><p style="text-align:center;opacity:0.5">ยังไม่เปิดเผย</p>`; }
+  
+  meta.innerHTML = `<div class="lbn">${c.prefix}${c.firstName} ${c.lastName}</div><div class="lbd">${c.dept}</div>`; lb.classList.remove('hidden');
+}
+
+function closeLightbox() { document.getElementById('lightbox').classList.add('hidden'); }
+
+// ── LIGHTBOX NAVIGATION FUNCTIONS ──
+function navigateLightbox(step) {
+  if (currentLightboxContestantId === null) return;
+  
+  const currentIndex = reelOrder.findIndex(c => c.id === currentLightboxContestantId);
+  let nextIndex = currentIndex + step;
+
+  // Wrap around
+  if (nextIndex < 0) nextIndex = reelOrder.length - 1;
+  if (nextIndex >= reelOrder.length) nextIndex = 0;
+
+  const nextContestant = reelOrder[nextIndex];
+  openLightbox(nextContestant);
+}
+
+function prevLightbox() { navigateLightbox(-1); }
+function nextLightbox() { navigateLightbox(1); }
+
+// ═══════════════════════════════════════════════════════════
+//  SCREEN HELPERS & LOGIC (คงเดิม)
+// ═══════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  const el = document.getElementById(id); el.classList.remove('hidden'); el.classList.add('fade-in'); setTimeout(() => el.classList.remove('fade-in'), 700);
+}
+function goToSelect() {
+  if (Object.keys(revealed).length >= 3) { showDone(); return; }
+  Object.keys(awards).forEach(k => {
+    const statusEl = document.getElementById(k+'-status'), card = document.getElementById('card-'+k);
+    if (revealed[k] !== undefined) { statusEl.textContent = '✅ ประกาศแล้ว · ' + contestants[revealed[k]].nick; card.classList.add('done-card'); } 
+    else { statusEl.textContent = 'พร้อมประกาศ'; card.classList.remove('done-card'); }
+  });
+  showScreen('screen-select');
+}
+
+function findWinner(votesArr) {
+  const noRepeat = isNoRepeat();
+  const wonIndices = new Set(Object.values(revealed));
+  let maxV = -Infinity, winIdx = 0;
+  votesArr.forEach((v, i) => {
+    if (noRepeat && wonIndices.has(i)) return;
+    if (v > maxV) { maxV = v; winIdx = i; }
+  });
+  return winIdx;
+}
+
+function startReveal(awardKey) {
+  if (revealed[awardKey] !== undefined) { alert('รางวัลนี้ประกาศไปแล้ว!'); return; }
+  const award = awards[awardKey];
+  document.getElementById('spin-label').textContent = `🌊 กำลังเปิดเผยผู้ชนะ… ${award.shortName}`;
+  const fill = document.getElementById('countdown-fill'); fill.style.animation = 'none'; fill.offsetHeight; fill.style.animation = 'shrink 7s linear forwards';
+  const reel = document.getElementById('reel'); reel.innerHTML = '';
+  
+  const REPEATS = 60;
+  for (let r=0; r<REPEATS; r++) {
+    reelOrder.forEach(c => {
+      const div = document.createElement('div'); div.className='reel-item';
+      const slot = document.createElement('div'); slot.className='ri-placeholder'; slot.textContent='🌸';
+      const img = new Image(); img.src=`${c.id}.png`; img.style.cssText='width:100%;height:100%;object-fit:cover;';
+      img.onload = () => { slot.innerHTML=''; slot.appendChild(img); };
+      const info = document.createElement('div'); info.className='ri-info';
+      info.innerHTML=`<div class="ri-name">${c.prefix}${c.firstName}</div><div class="ri-nick">"${c.nick}" · ${c.dept}</div>`;
+      div.appendChild(slot); div.appendChild(info); reel.appendChild(div);
+    });
+  }
+
+  showScreen('screen-spin');
+  const winnerIdx = findWinner(award.votes);
+  const ITEM_H = 80, N = reelOrder.length, TOTAL_MS=7000, FAST_MS=4000, SLOWDOWN_MS=3000, FAST_PPS=2400, SLOW_PPS=180;
+  let startTime=null, offset=0, rafId=null, prevElapsed=0;
+  
+  startDrumRoll();
+  let floaterInterval = setInterval(()=>{
+    const f=document.createElement('div'); f.className='floater'; f.textContent=['🌊','☀️','🌺','🐚','🌸','✨','🏖️','🐠'][Math.floor(Math.random()*8)];
+    f.style.left=Math.random()*90+'%'; f.style.bottom='10%'; document.body.appendChild(f); setTimeout(()=>f.remove(),2000);
+  },350);
+
+  function tick(ts){
+    if(!startTime) startTime=ts; const elapsed=ts-startTime;
+    const t2=Math.min(Math.max(elapsed-FAST_MS,0)/SLOWDOWN_MS,1);
+    const speed = elapsed<FAST_MS ? FAST_PPS : FAST_PPS+(SLOW_PPS-FAST_PPS)*(1-Math.pow(1-t2,3));
+    const dt=Math.min(20,elapsed-prevElapsed)/1000; prevElapsed=elapsed; offset+=speed*dt;
+    reel.style.transform=`translateY(-${offset%(N*ITEM_H*(REPEATS/2))}px)`;
+    if(elapsed<TOTAL_MS){ rafId=requestAnimationFrame(tick); } 
+    else { cancelAnimationFrame(rafId); clearInterval(floaterInterval); stopDrumRoll(); revealed[awardKey]=winnerIdx; playFanfare(); showWinner(awardKey, winnerIdx); }
+  }
+  setTimeout(()=>{ rafId=requestAnimationFrame(tick); }, 80);
+}
+
+function showWinner(awardKey, idx) {
+  const aw=awards[awardKey], c=contestants[idx];
+
+  document.getElementById('winner-award-name').textContent=aw.name;
+  document.getElementById('winner-award-name').style.color=aw.color;
+  document.getElementById('winner-name').textContent=`${c.prefix}${c.firstName} ${c.lastName}`;
+  document.getElementById('winner-nick').textContent=`"${c.nick}"`;
+  document.getElementById('winner-dept').textContent=c.dept;
+  document.querySelector('.winner-info-panel').style.borderLeft=`3px solid ${aw.color}`;
+
+  // Image Setup
+  const panel=document.getElementById('winner-photo-panel');
+  panel.querySelectorAll('img').forEach(i=>i.remove());
+  const slot=document.getElementById('winner-photo-slot'); slot.style.display='flex';
+  const img=new Image(); img.src=`${c.id}.png`; img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;display:block;z-index:0;';
+  img.onload=()=>{ slot.style.display='none'; panel.appendChild(img); };
+
+  if(document.getElementById(`gc-${c.id}`)) document.getElementById(`gc-${c.id}`).classList.add('revealed');
+
+  // ── จัดการโชว์คะแนนเฉพาะหมวดซุปตาร์ ──
+  const scoreEl = document.getElementById('winner-main-score');
+  const runnerUpsEl = document.getElementById('runner-ups-container');
+  
+  if (awardKey === 'superstar') {
+    // คำนวณอันดับ
+    let mapped = aw.votes.map((score, i) => ({ idx: i, score: score }));
+    mapped.sort((a, b) => b.score - a.score);
+    
+    // โชว์คะแนนที่ 1
+    scoreEl.textContent = `ได้คะแนนโหวต: ${mapped[0].score} คะแนน`;
+    scoreEl.style.display = 'block';
+
+    // โชว์อันดับ 2 และ 3
+    if (mapped[1] && mapped[2]) {
+      const p2 = contestants[mapped[1].idx];
+      const p3 = contestants[mapped[2].idx];
+      
+      document.getElementById('ru2-name').innerHTML = `<b>${p2.nick}</b><br><span style="font-size:0.75rem;opacity:0.6">${p2.firstName}</span>`;
+      document.getElementById('ru2-score').textContent = `${mapped[1].score} คะแนน`;
+      
+      document.getElementById('ru3-name').innerHTML = `<b>${p3.nick}</b><br><span style="font-size:0.75rem;opacity:0.6">${p3.firstName}</span>`;
+      document.getElementById('ru3-score').textContent = `${mapped[2].score} คะแนน`;
+      
+      runnerUpsEl.style.display = 'flex';
+    } else {
+      runnerUpsEl.style.display = 'none';
+    }
+  } else {
+    // ซ่อนคะแนนและอันดับสำหรับรางวัลอื่น
+    scoreEl.style.display = 'none';
+    runnerUpsEl.style.display = 'none';
+  }
+
+  showScreen('screen-winner');
+  document.querySelector('#screen-winner .btn-next').textContent = Object.keys(revealed).length>=3 ? 'ดูสรุปผลรางวัล 🎊' : 'ประกาศรางวัลถัดไป →';
+}
+
+function showDone() {
+  const grid=document.getElementById('summary-grid'); grid.innerHTML='';
+  Object.keys(awards).forEach(k=>{
+    const aw=awards[k], idx=revealed[k], c=idx!==undefined?contestants[idx]:null;
+    const card=document.createElement('div'); card.className='summary-card'; card.style.borderColor=`${aw.color}44`;
+    card.innerHTML=`<div class="summary-icon">${aw.icon}</div><div class="summary-award">${aw.shortName}</div><div class="summary-winner-name">${c?c.prefix+c.firstName+' '+c.lastName:'—'}</div><div class="summary-winner-nick">${c?'"'+c.nick+'"':''}</div>`;
+    grid.appendChild(card);
+  });
+  showScreen('screen-done');
+}
+function restart() { Object.keys(revealed).forEach(k=>delete revealed[k]); isGalleryUnlocked=false; showScreen('screen-start'); }
+</script>
+</body>
+</html>
